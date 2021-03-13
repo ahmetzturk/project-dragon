@@ -12,7 +12,6 @@ namespace RPG.Core
 
         private void Awake()
         {
-            print("calisti");
             if (hasSpawned) return;
             SpawnPersistentObjects();
             hasSpawned = true;          
@@ -20,7 +19,7 @@ namespace RPG.Core
 
         private void Start()
         {
-            print("start");
+            
         }
 
         private void SpawnPersistentObjects()
