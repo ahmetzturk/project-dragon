@@ -4,26 +4,35 @@ using UnityEngine;
 using RPG.Movement;
 using System;
 using RPG.Combat;
-using RPG.Core;
+using RPG.Resources;
 
 namespace RPG.Control
 {
     public class PlayerController : MonoBehaviour
     {
         [SerializeField] private Mover mover;
-        // Start is called before the first frame update
-        void Start()
+        enum CursorType
+        {
+            None,
+            Movement,
+            Combat
+        }
+
+        
+        
+        void Awake()
         {
             mover = GetComponent<Mover>();
         }
 
-        // Update is called once per frame
+        
         void Update()
         {
             if (GetComponent<Health>().IsDead()) return;
             if (InteractWithCombat()) return;        
             if (InteractWithMovement()) return;
             //print("Nothing to do");
+            SetCursor(CursorType.None);
         }
         
         private bool InteractWithCombat()
@@ -39,7 +48,7 @@ namespace RPG.Control
                 }
                 if (Input.GetMouseButton(0))
                     GetComponent<Fighter>().Attack(target.gameObject);
-
+                SetCursor(CursorType.Combat);
                 return true;               
             }
             return false;
@@ -54,9 +63,15 @@ namespace RPG.Control
                 {
                     mover.StartMoveAction(hit.point, 1);               
                 }
+                SetCursor(CursorType.Movement);
                 return true;
             }
             return false;
+        }
+
+        private void SetCursor(CursorType movement)
+        {
+            //Cursor.SetCursor()
         }
 
         private static Ray GetMouseRay()

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using RPG.Saving;
+using RPG.Resources;
 
 namespace RPG.Movement
 {
@@ -13,16 +14,14 @@ namespace RPG.Movement
         [SerializeField] private float maxSpeed = 6f;
 
         private NavMeshAgent navMeshAgent;
-        private Animator animator;     
+        private Animator animator;
 
-        // Start is called before the first frame update
-        void Start()
+        private void Awake()
         {
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
         }
-
-        // Update is called once per frame
+      
         void Update()
         {
             navMeshAgent.enabled = !GetComponent<Health>().IsDead();
@@ -68,10 +67,10 @@ namespace RPG.Movement
         public void RestoreState(object state)
         {
             Dictionary<string, object> data = (Dictionary<string, object>) state;
-            GetComponent<NavMeshAgent>().enabled = false;
+            navMeshAgent.enabled = false;
             transform.position = ((SerializableVector3)data["position"]).ToVector();
             transform.eulerAngles = ((SerializableVector3)data["rotation"]).ToVector();
-            GetComponent<NavMeshAgent>().enabled = true;
+            navMeshAgent.enabled = true;
         }
     }
 }

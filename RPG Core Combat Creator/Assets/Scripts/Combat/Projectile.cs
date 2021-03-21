@@ -1,4 +1,4 @@
-﻿using RPG.Core;
+﻿using RPG.Resources;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,19 +9,34 @@ namespace RPG.Combat
     {
         Health target = null;
         [SerializeField] float speed = 1f;
-        float damage = 0;
+        [SerializeField] GameObject hitEffect = null;
+        private float damage = 0;
+        [SerializeField] private bool isHoming = true;
+        [SerializeField] private float maxLifeTime = 10f;
+        [SerializeField] private GameObject[] DestroyOnHit;
+        [SerializeField] private float lifeAfterImpact = 0.2f;
+        private GameObject instigator = null;
+        private void Start()
+        {
+            transform.LookAt(GetAimLocation());
+        }
 
         void Update()
         {
             if (target == null) return;
-            transform.LookAt(GetAimLocation());
+            if(isHoming && !target.IsDead())
+            {
+                transform.LookAt(GetAimLocation());
+            }
             transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
 
-        public void SetTarget(Health target, float damage) 
-        {
+        public void SetTarget(Health target, GameObject instigator, float damage) 
+        {          
             this.target = target;
             this.damage = damage;
+            this.instigator = instigator;
+            Destroy(gameObject, maxLifeTime);
         }          
 
         private Vector3 GetAimLocation()
@@ -35,8 +50,20 @@ namespace RPG.Combat
         {
             if (other.GetComponent<Health>() == target)
             {
-                target.TakeDamage(damage);
-                Destroy(gameObject);
+                if (target.IsDead()) return;
+                if (hitEffect != null)
+                {
+                    GameObject hitEffect = Instantiate(this.hitEffect, GetAimLocation(), transform.rotation);
+                }
+                target.TakeDamage(instigator, damage);
+
+                speed = 0;
+
+                foreach (var item in DestroyOnHit)
+                {
+                    Destroy(item);
+                }
+                Destroy(gameObject, lifeAfterImpact);
             }
         }
     }
