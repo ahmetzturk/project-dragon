@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace RPG.Stats
 {
@@ -15,27 +16,26 @@ namespace RPG.Stats
         [SerializeField] GameObject levelUpParticleEffect = null;
         [SerializeField] bool shouldUseModifiers = false;
 
-        public event Action onLevelUp;
+        public event Action OnLevelUp;
 
-        LazyValue <int> currentLevel;
+        int currentLevel = 0;
         Experience experience = null;
 
         private void Awake()
-        {
-            Experience experience = GetComponent<Experience>();
-            currentLevel = new LazyValue<int>(CalculateLevel);
+        {          
+            experience = GetComponent<Experience>();          
         }
 
         private void Start()
         {
-            currentLevel.ForceInit();
+            currentLevel = CalculateLevel();
         }
 
         private void OnEnable()
-        {
+        {                   
             if (experience != null)
             {
-                experience.onExperienceGained += UpdateLevel;
+                experience.OnExperienceGained += UpdateLevel;         
             }
         }
 
@@ -43,18 +43,18 @@ namespace RPG.Stats
         {
             if (experience != null)
             {
-                experience.onExperienceGained -= UpdateLevel;
+                experience.OnExperienceGained -= UpdateLevel;
             }
         }
 
         private void UpdateLevel()
         {
             int newLevel = CalculateLevel();
-            if (currentLevel.value < newLevel)
+            if (currentLevel < newLevel)
             {
-                currentLevel.value = newLevel;
+                currentLevel = newLevel;
                 LevelUpEffect();
-                onLevelUp();
+                OnLevelUp();
             }
         }
 
@@ -75,7 +75,11 @@ namespace RPG.Stats
 
         public int GetLevel()
         {
-            return currentLevel.value;
+            if (currentLevel < 1)
+            {
+                currentLevel = CalculateLevel();
+            }
+            return currentLevel;
         }
 
         private float GetAdditiveModifiers(Stat stat)

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace RPG.Resources 
+namespace RPG.Attributes 
 {
     public class HealthDisplay : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace RPG.Resources
         
         void Update()
         {
-            GetComponent<Text>().text = health.GetHealthPoints() + "% / " + health.GetMaxHealthPoints() + "%";         
+            GetComponent<Text>().text = health.GetHealthPoints() + " / " + health.GetMaxHealthPoints() + "";         
         }
     }
 }

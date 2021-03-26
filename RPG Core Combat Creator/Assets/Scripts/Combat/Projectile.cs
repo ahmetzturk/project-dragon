@@ -1,7 +1,8 @@
-﻿using RPG.Resources;
+﻿using RPG.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace RPG.Combat
 {
@@ -16,6 +17,8 @@ namespace RPG.Combat
         [SerializeField] private GameObject[] DestroyOnHit;
         [SerializeField] private float lifeAfterImpact = 0.2f;
         private GameObject instigator = null;
+
+        [SerializeField] UnityEvent onHit;
         private void Start()
         {
             transform.LookAt(GetAimLocation());
@@ -51,6 +54,9 @@ namespace RPG.Combat
             if (other.GetComponent<Health>() == target)
             {
                 if (target.IsDead()) return;
+
+                onHit.Invoke();
+
                 if (hitEffect != null)
                 {
                     GameObject hitEffect = Instantiate(this.hitEffect, GetAimLocation(), transform.rotation);

@@ -1,4 +1,4 @@
-﻿using RPG.Resources;
+﻿using RPG.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +23,7 @@ namespace RPG.Combat
                 GetComponent<Text>().text = "N/A";
                 return;
             }
-            GetComponent<Text>().text = targetHealth.GetHealthPoints() + "% / " + targetHealth.GetMaxHealthPoints() + "%";
+            GetComponent<Text>().text = targetHealth.GetHealthPoints() + " / " + targetHealth.GetMaxHealthPoints() + "";
         }
     }
 }

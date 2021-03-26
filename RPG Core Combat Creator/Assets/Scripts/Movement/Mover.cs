@@ -1,17 +1,17 @@
 ﻿using RPG.Core;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using RPG.Saving;
-using RPG.Resources;
+using RPG.Attributes;
 
 namespace RPG.Movement
 {
     public class Mover : MonoBehaviour, IAction, ISaveable 
     {
         [SerializeField] private float maxSpeed = 6f;
+        [SerializeField] float maxNavhPathLength = 40f;
 
         private NavMeshAgent navMeshAgent;
         private Animator animator;
@@ -37,11 +37,39 @@ namespace RPG.Movement
             animator.SetFloat("forwardSpeed", speed);
         }
 
+        private float GetPathLength(NavMeshPath path)
+        {
+            float totalDistance = 0;
+            for (int i = 0; i < path.corners.Length - 1; i++)
+            {
+                totalDistance += Vector3.Distance(path.corners[i], path.corners[i + 1]);
+            }
+            return totalDistance;
+        }
+
         public void StartMoveAction(Vector3 destination, float speedFraction)
         {
             GetComponent<ActionScheduler>().StartAction(this);
             //GetComponent<Fighter>().Cancel();
             MoveTo(destination, speedFraction);
+        }
+
+        public bool CanMoveTo(Vector3 desination)
+        {
+            NavMeshPath path = new NavMeshPath();
+            if (!NavMesh.CalculatePath(transform.position, desination, NavMesh.AllAreas, path))
+            {
+                return false;
+            }
+            if (path.status != NavMeshPathStatus.PathComplete)
+            {
+                return false;
+            }
+            if (GetPathLength(path) > maxNavhPathLength)
+            {
+                return false;
+            }
+            return true;
         }
 
         public void MoveTo(Vector3 destination, float speedFraction)
